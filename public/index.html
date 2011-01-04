@@ -3,6 +3,21 @@
     <head>
         <meta charset="utf-8">
         <title>Kadoom!</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/client.js"></script>
+        <script src="/js/player.js"></script>
+        <script>
+            var onLoad = function() {
+                Client.init();
+                Client.setViewport({
+                    'buffer':   'viewport',
+                    'width':    800,
+                    'height':   600
+                });
+                Client.setPlayer(new Player());
+                Client.connect();
+            };
+        </script>
     </head>
     <body>
         <header>
@@ -11,6 +26,7 @@
         <div>
             The good stuff will happen here!
         </div>
+        <canvas id="viewport"></canvas>
         <footer>
             by <a href="http://github.com/makeusabrew">makeusabrew</a>
         </footer>
