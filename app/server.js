@@ -64,7 +64,31 @@ console.log("Server running on port 8124");
 
 var socket = io.listen(server);
 
+/**
+ * run once initialisation here
+ */
+var world = require("./game/world").factory();
+var mapData = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+];
+world.loadMapFromData(mapData);    // @todo how do we make this load from a file, given that world.js is exposed client side too?
+
 socket.on("connection", function(socketClient) {
     var player = require("./game/player").factory();
-    console.log(player);
+
+    // give this client info about the world state. probably should just
+    // consolodate this to world.getData() or something at some stage
+    socketClient.send({
+        'type': 'loadWorld',
+        'mapData': mapData
+    });
 });

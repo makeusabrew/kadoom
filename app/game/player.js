@@ -8,10 +8,10 @@ Player.prototype.init = function() {
     //
 };
 
-Player.prototype.factory = function() {
+Player.factory = function() {
     return new Player();
 }
 
 if (typeof exports != "undefined") {
-    exports.factory = Player.prototype.factory;
+    exports.factory = Player.factory;
 }

@@ -6,16 +6,20 @@
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/client.js"></script>
         <script src="/js/shared/player.js"></script>
+        <script src="/js/shared/world.js"></script>
         <script>
             var onLoad = function() {
-                Client.init();
+                // @todo show loading state
+                Client.init();  // this is _local_ initialisation rather than remote
                 Client.setViewport({
                     'buffer':   'viewport',
                     'width':    800,
                     'height':   600
                 });
-                Client.setPlayer(new Player());
+                Client.setPlayer(Player.factory());
+                Client.setWorld(World.factory());
                 Client.connect();
+                // @todo remove loader, show world
             };
         </script>
     </head>
