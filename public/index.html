@@ -5,7 +5,7 @@
         <title>Kadoom!</title>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/client.js"></script>
-        <script src="/js/player.js"></script>
+        <script src="/js/shared/player.js"></script>
         <script>
             var onLoad = function() {
                 Client.init();
@@ -19,7 +19,7 @@
             };
         </script>
     </head>
-    <body>
+    <body onload="javascript:onLoad();">
         <header>
             <h1>Kadoom!</h1>
         </header>
