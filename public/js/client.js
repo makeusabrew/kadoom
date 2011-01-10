@@ -2,13 +2,16 @@ var Client = {
     player: null,
     socket: null,
     world: null,
+    surface: null,
+    onReady: null,
+    tileCache: {},
 
     init: function() {
         //
     },
 
     setViewport: function(options) {
-        //
+        Client.surface = new Surface(options.buffer, options.width, options.height);
     },
 
     setPlayer: function(p) {
@@ -35,6 +38,29 @@ var Client = {
     },
 
     loadWorld: function(data) {
-        Client.world.loadMapFromData(data.mapData);
+        Client.world.loadFromData(data.worldData);
+        Client.cacheWorldTiles();
+        if (typeof Client.onReady == "function") {
+            Client.onReady();
+        }
+    },
+
+    render: function() {
+        for (var i = 0; i < 20; i++) {
+            for (var j = 0; j < 15; j++) {
+                var tile = Client.world.getTile(i, j);
+                if (tile !== null) {
+                    Client.surface.drawImage(Client.tileCache[tile], i*32, j*32, 32, 32);
+                }
+            }
+        }
+    },
+
+    cacheWorldTiles: function() {
+        for (i in Client.world.tiles) {
+            var img = new Image(1, 1);
+            img.src = "http://cdn.kadoom.org"+Client.world.tiles[i];
+            Client.tileCache[i] = img;
+        }
     }
 };

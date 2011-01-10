@@ -3,8 +3,14 @@
     <head>
         <meta charset="utf-8">
         <title>Kadoom!</title>
+        <!-- global dependencies -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
+        <!-- client side only code -->
         <script src="/js/client.js"></script>
+        <script src="/js/game.js"></script>
+        <script src="/js/surface.js"></script>
+        <!-- shared client/server logic -->
         <script src="/js/shared/player.js"></script>
         <script src="/js/shared/world.js"></script>
         <script>
@@ -13,13 +19,19 @@
                 Client.init();  // this is _local_ initialisation rather than remote
                 Client.setViewport({
                     'buffer':   'viewport',
-                    'width':    800,
-                    'height':   600
+                    'width':    640,
+                    'height':   480 
                 });
                 Client.setPlayer(Player.factory());
                 Client.setWorld(World.factory());
                 Client.connect();
-                // @todo remove loader, show world
+
+                Game.registerRenderHandler(Client.render);
+
+                Client.onReady = function() {
+                    // @todo remove loader, show world
+                    Game.tick();
+                };
             };
         </script>
     </head>
@@ -30,7 +42,7 @@
         <div>
             The good stuff will happen here!
         </div>
-        <canvas id="viewport"></canvas>
+        <canvas id="viewport" style="border:1px solid black;"></canvas>
         <footer>
             by <a href="http://github.com/makeusabrew">makeusabrew</a>
         </footer>
