@@ -6,7 +6,7 @@ var http = require("http"),
 /**
  * external dependancies
  */
-var io = require("../lib/socket-io-node/lib/socket.io");
+var io = require("../deps/socket-io-node/lib/socket.io");
 
 /**
  * some constants we'll make use of serving files
