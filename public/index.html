@@ -7,6 +7,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <!-- client side only code -->
+        <script src="/js/bus.js"></script>
         <script src="/js/client.js"></script>
         <script src="/js/game.js"></script>
         <script src="/js/surface.js"></script>
@@ -28,10 +29,10 @@
 
                 Game.registerRenderHandler(Client.render);
 
-                Client.onReady = function() {
+                Bus.subscribe("client_ready", null, function() {
                     // @todo remove loader, show world
                     Game.tick();
-                };
+                });
             };
         </script>
     </head>

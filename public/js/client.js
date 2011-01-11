@@ -40,9 +40,7 @@ var Client = {
     loadWorld: function(data) {
         Client.world.loadFromData(data.worldData);
         Client.cacheWorldTiles();
-        if (typeof Client.onReady == "function") {
-            Client.onReady();
-        }
+        Bus.publish("client_ready", null);
     },
 
     render: function() {
