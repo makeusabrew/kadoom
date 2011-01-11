@@ -8,6 +8,7 @@
         <script src="/socket.io/socket.io.js"></script>
         <!-- client side only code -->
         <script src="/js/bus.js"></script>
+        <script src="/js/camera.js"></script>
         <script src="/js/client.js"></script>
         <script src="/js/game.js"></script>
         <script src="/js/surface.js"></script>
@@ -18,13 +19,14 @@
             var onLoad = function() {
                 // @todo show loading state
                 Client.init();  // this is _local_ initialisation rather than remote
+                Client.setCamera(Camera.factory());
+                Client.setPlayer(Player.factory());
+                Client.setWorld(World.factory());
                 Client.setViewport({
                     'buffer':   'viewport',
                     'width':    640,
                     'height':   480 
                 });
-                Client.setPlayer(Player.factory());
-                Client.setWorld(World.factory());
                 Client.connect();
 
                 Game.registerRenderHandler(Client.render);
