@@ -30,7 +30,7 @@ var server = http.createServer(function(request, response) {
         default:
             var filename;
             if (cUrl.match(/\/js\/shared\/.*\.js/)) {
-                filename = "app/game/"+cUrl.substr(10);
+                filename = "app/game/shared/"+cUrl.substr(10);
             } else {
                 filename = path.join(WEBROOT, cUrl);
             }
@@ -67,7 +67,8 @@ var socket = io.listen(server);
 /**
  * run once initialisation here
  */
-var world = require("./game/world").factory();
+var world = require("./game/shared/world").factory();
+// @todo move this to json encoded files instead
 var worldData = {
     cells: [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -95,7 +96,7 @@ var worldData = {
 world.loadFromData(worldData);    // @todo how do we make this load from a file, given that world.js is exposed client side too?
 
 socket.on("connection", function(socketClient) {
-    var player = require("./game/player").factory();
+    var player = require("./game/shared/player").factory();
 
     // give this client info about the world state. probably should just
     // consolodate this to world.getData() or something at some stage
