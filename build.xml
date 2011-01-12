@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<project name="Kadoom" default="build">
+
+    <property name="project.dir" value="." />
+    <property name="tests.dir" value="tests" />
+    <property name="reports.dir" value="reports" />
+
+    <target name="cleanup" description="Empty Temporary Dirs">
+        <delete>
+            <fileset dir="${tests.dir}/${reports.dir}">
+                <include name="*.xml" />
+                <include name="*.sc" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="sloc" description="Generate SLOC">
+        <echo msg="Generating SLOC" />
+        <exec checkreturn="true" passthru="false" command="sloccount --wide --details . 2>/dev/null | egrep -v 'deps|reports' > ${tests.dir}/${reports.dir}/sloccount.sc" />
+    </target>
+
+    <target name="build" description="Build" depends="cleanup,sloc">
+        <echo msg="TODO" />
+    </target>
+</project>
