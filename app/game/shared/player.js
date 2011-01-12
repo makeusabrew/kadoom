@@ -33,6 +33,15 @@ Player.prototype.loadFromData = function(data) {
 
 Player.prototype.move = function() {
     this.a += this.rotation;
+    this.x +=  Math.cos((this.a/180)*Math.PI) * this.velocity;
+    this.y += Math.sin((this.a/180)*Math.PI) * this.velocity;
+};
+
+Player.prototype.getPosition = function() {
+    return {
+        x: this.x,
+        y: this.y
+    }
 };
 
 Player.factory = function() {

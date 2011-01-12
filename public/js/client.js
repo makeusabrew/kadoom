@@ -28,13 +28,19 @@ var Client = {
 
     processInput: function() {
         if (Input.isKeyDown("LEFT_ARROW")) {
-            Client.getPlayer().rotation += -10;
-            console.log(Client.getPlayer().rotation);
+            Client.getPlayer().rotation = -10;
         } else if (Input.isKeyDown("RIGHT_ARROW")) {
-            Client.getPlayer().rotation += 10;
-            console.log(Client.getPlayer().rotation);
+            Client.getPlayer().rotation = 10;
         } else {
             Client.getPlayer().rotation = 0;
+        }
+
+        if (Input.isKeyDown("UP_ARROW")) {
+            Client.getPlayer().velocity = 10;
+        } else if (Input.isKeyDown("DOWN_ARROW")) {
+            Client.getPlayer().velocity = -10;
+        } else {
+            Client.getPlayer().velocity = 0;
         }
     },
 
@@ -93,6 +99,9 @@ var Client = {
     },
 
     render: function() {
+        Client.camera.centreOnPosition(Client.getPlayer().getPosition());
+
+        Client.surface.clear();
         var cX = Math.floor(Client.camera.x / 32);
         var cY = Math.floor(Client.camera.y / 32);
         var xOff = Client.camera.x % 32;
@@ -106,6 +115,22 @@ var Client = {
                 }
             }
         }
+        
+        // draw an arrow in the most gorgeously graceful way ever!!
+        var offset = Client.camera.getOffset(Client.getPlayer().getPosition());
+        var a = Client.getPlayer().a;
+        var x1 = offset.x + Math.cos((a/180)*Math.PI) * 25;
+        var y1 = offset.y + Math.sin((a/180)*Math.PI) * 25;
+        Client.surface.line(offset.x, offset.y, x1, y1, "rgb(255, 0, 0)");
+        a = a - 30;
+        var x2 = Math.cos((a/180)*Math.PI) * -10;
+        var y2 = Math.sin((a/180)*Math.PI) * -10;
+        Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
+        a = a + 60;
+        var x2 = Math.cos((a/180)*Math.PI) * -10;
+        var y2 = Math.sin((a/180)*Math.PI) * -10;
+        Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
+        
     },
 
     cacheWorldTiles: function() {

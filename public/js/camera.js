@@ -12,6 +12,21 @@ Camera.prototype.setViewport = function(options) {
     this.height = options.height;
 };
 
+Camera.prototype.centreOnPosition = function(p) {
+    this.x = p.x - (this.width / 2);
+    this.y = p.y - (this.height / 2);
+};
+
+Camera.prototype.getOffset = function(p) {
+    var oX = p.x - this.x;
+    var oY = p.y - this.y;
+
+    return {
+        x: oX,
+        y: oY
+    };
+};
+
 Camera.factory = function() {
     return new Camera();
 }

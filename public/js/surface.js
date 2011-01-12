@@ -44,3 +44,8 @@ Surface.prototype.setDimensions = function(w, h) {
 Surface.prototype.drawImage = function(img, x, y, w, h) {
     this.buffer.drawImage(img, x, y, w, h);
 };
+
+Surface.prototype.clear = function() {
+    this.buffer.fillStyle = "rgb(0, 0, 0)";
+    this.buffer.fillRect(0, 0, this.elem.width, this.elem.height);
+};

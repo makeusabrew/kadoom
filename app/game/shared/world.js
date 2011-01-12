@@ -13,7 +13,7 @@ World.prototype.loadFromData = function(data) {
 };
 
 World.prototype.getTile = function(x, y) {
-    if (x < this.width && y < this.height) { 
+    if (x >= 0 && x < this.width && y >= 0 && y < this.height) { 
         return this.cells[y][x];
     }
     return null;
