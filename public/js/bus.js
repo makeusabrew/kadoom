@@ -6,6 +6,9 @@ var Bus = {
     _bindTo: document,
 
     publish: function(topic, data) {
+        if (typeof data == "undefined") {
+            data = null;
+        }
         $(Bus._bindTo).trigger(topic, data);
     },
 

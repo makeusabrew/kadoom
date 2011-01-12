@@ -1,6 +1,7 @@
 var Client = {
     camera: null,
     player: null,
+    players: [],
     socket: null,
     world: null,
     surface: null,
@@ -21,6 +22,22 @@ var Client = {
         });
     },
 
+    tick: function() {
+        Client.getPlayer().move();
+    },
+
+    processInput: function() {
+        if (Input.isKeyDown("LEFT_ARROW")) {
+            Client.getPlayer().rotation += -10;
+            console.log(Client.getPlayer().rotation);
+        } else if (Input.isKeyDown("RIGHT_ARROW")) {
+            Client.getPlayer().rotation += 10;
+            console.log(Client.getPlayer().rotation);
+        } else {
+            Client.getPlayer().rotation = 0;
+        }
+    },
+
     setCamera: function(c) {
         Client.camera = c;
     },
@@ -33,6 +50,10 @@ var Client = {
         Client.world = w;
     },
 
+    getPlayer: function() {
+        return Client.player;
+    },
+
     connect: function() {
         Client.socket = new io.Socket();
         Client.socket.connect();
@@ -40,18 +61,35 @@ var Client = {
     },
 
     onMessage: function(data) {
-        var fn = data.type;
-        if (typeof Client[fn] == "function") {
-            Client[fn](data);
+        if (typeof Client[data.type] == "function") {
+            if (typeof data.data != "undefined") {
+                Client[data.type](data.data);
+            } else {
+                throw new Error("Message has no data element");
+            }
         } else {
             throw new TypeError("Client has no function "+data.type);
         }
     },
 
-    loadWorld: function(data) {
-        Client.world.loadFromData(data.worldData);
+    loadState: function(data) {
+        Client.world.loadFromData(data.world);
         Client.cacheWorldTiles();
-        Bus.publish("client_ready", null);
+
+        for(var i = 0; i < data.players.length; i++) {
+            Client.loadPlayer(data.players[i]);
+        }
+        Client.players = data.players;
+        Bus.publish("client_ready");
+    },
+
+    loadPlayer: function(data) {
+        var p = Player.factory();
+        p.loadFromData(data);
+        Client.players.push(p);
+        if (data.id != 0) {
+            Client.player = p;
+        }
     },
 
     render: function() {

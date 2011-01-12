@@ -11,6 +11,7 @@
         <script src="/js/camera.js"></script>
         <script src="/js/client.js"></script>
         <script src="/js/game.js"></script>
+        <script src="/js/input.js"></script>
         <script src="/js/surface.js"></script>
         <!-- shared client/server logic -->
         <script src="/js/shared/player.js"></script>
@@ -20,7 +21,7 @@
                 // @todo show loading state
                 Client.init();  // this is _local_ initialisation rather than remote
                 Client.setCamera(Camera.factory());
-                Client.setPlayer(Player.factory());
+                //Client.setPlayer(Player.factory());
                 Client.setWorld(World.factory());
                 Client.setViewport({
                     'buffer':   'viewport',
@@ -29,7 +30,19 @@
                 });
                 Client.connect();
 
+                Game.registerInputHandler(Client.processInput);
+                Game.registerTickHandler(Client.tick);
                 Game.registerRenderHandler(Client.render);
+
+                Input.captureKeys([
+                    'LEFT_ARROW',
+                    'RIGHT_ARROW',
+                    'UP_ARROW',
+                    'DOWN_ARROW',
+                    'SPACE_BAR'
+                ]);
+
+                Input.bindKeys(window);
 
                 Bus.subscribe("client_ready", null, function() {
                     // @todo remove loader, show world
