@@ -1,6 +1,7 @@
 var http = require("http"),
     url = require("url"),
     path = require("path"),
+    util = require("util"),
     mime = require("./modules/mime"),
     fs = require("fs");
 /**
@@ -103,10 +104,24 @@ socket.on("connection", function(socketClient) {
     player.setId(socketClient.sessionId);
     stateManager.addPlayer(player);
 
+    // inform other clients
+    socketClient.broadcast({
+        'type': 'addPlayer',
+        'data': player.getCurrentState(socketClient.sessionId)
+    });
     // give this client info about the world state. probably should just
     // consolodate this to world.getData() or something at some stage
     socketClient.send({
         'type': 'loadState',
         'data': stateManager.getCurrentState(socketClient.sessionId)
+    });
+
+    socketClient.on("message", function(data) {
+        switch (data.type) {
+            case 'playerMove':
+                stateManager.movePlayer(data.data);
+                socketClient.broadcast(data);
+                break;
+        }
     });
 });

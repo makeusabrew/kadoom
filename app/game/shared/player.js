@@ -1,6 +1,6 @@
 Player = function() {
-    this.x = 0;
-    this.y = 0;
+    this.x = 320;
+    this.y = 240;
     this.a = 0;
     this.rotation = 0;
     this.velocity = 0;
@@ -20,7 +20,7 @@ Player.prototype.getCurrentState = function(sessionId) {
         'x': this.x,
         'y': this.y,
         'a': this.a,
-        'id': (this.id == sessionId) ? sessionId : 0
+        'id': this.id
     };
 };
 
@@ -40,8 +40,12 @@ Player.prototype.move = function() {
 Player.prototype.getPosition = function() {
     return {
         x: this.x,
-        y: this.y
+        y: this.y,
     }
+};
+
+Player.prototype.hashState = function() {
+    return "|"+this.x+"|"+this.y+"|"+this.a+"|";
 };
 
 Player.factory = function() {

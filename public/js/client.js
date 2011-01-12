@@ -1,11 +1,11 @@
 var Client = {
     camera: null,
     player: null,
-    players: [],
+    players: {},
     socket: null,
     world: null,
     surface: null,
-    onReady: null,
+    playerHash: null,
     tileCache: {},
 
     init: function() {
@@ -24,6 +24,13 @@ var Client = {
 
     tick: function() {
         Client.getPlayer().move();
+        if (Client.getPlayer().hashState() != Client.playerHash) {
+            Client.socket.send({
+                'type':'playerMove',
+                'data': Client.getPlayer().getCurrentState()
+            });
+            Client.playerHash = Client.getPlayer().hashState();
+        }
     },
 
     processInput: function() {
@@ -83,19 +90,27 @@ var Client = {
         Client.cacheWorldTiles();
 
         for(var i = 0; i < data.players.length; i++) {
-            Client.loadPlayer(data.players[i]);
+            var p = Player.factory();
+            p.loadFromData(data.players[i]);
+            Client.players[p.id] = p;
+            if (p.id == data.sessionId) {
+                Client.player = p;
+                Client.playerHash = Client.getPlayer().hashState();
+            }
         }
-        Client.players = data.players;
         Bus.publish("client_ready");
     },
 
-    loadPlayer: function(data) {
+    addPlayer: function(data) {
         var p = Player.factory();
         p.loadFromData(data);
-        Client.players.push(p);
-        if (data.id != 0) {
-            Client.player = p;
-        }
+        Client.players[p.id] = p;
+    },
+
+    playerMove: function(data) {
+        console.log(data);
+        console.log(Client.players);
+        Client.players[data.id].loadFromData(data);
     },
 
     render: function() {
@@ -107,6 +122,8 @@ var Client = {
         var xOff = Client.camera.x % 32;
         var yOff = Client.camera.y % 32;
 
+        //console.log("cX: "+cX+" cY: "+cY+" xOff: "+xOff+" yOff: "+yOff);
+
         for (var i = 0; i < 20; i++) {
             for (var j = 0; j < 15; j++) {
                 var tile = Client.world.getTile(cX+i, cY+j);
@@ -116,20 +133,24 @@ var Client = {
             }
         }
         
-        // draw an arrow in the most gorgeously graceful way ever!!
-        var offset = Client.camera.getOffset(Client.getPlayer().getPosition());
-        var a = Client.getPlayer().a;
-        var x1 = offset.x + Math.cos((a/180)*Math.PI) * 25;
-        var y1 = offset.y + Math.sin((a/180)*Math.PI) * 25;
-        Client.surface.line(offset.x, offset.y, x1, y1, "rgb(255, 0, 0)");
-        a = a - 30;
-        var x2 = Math.cos((a/180)*Math.PI) * -10;
-        var y2 = Math.sin((a/180)*Math.PI) * -10;
-        Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
-        a = a + 60;
-        var x2 = Math.cos((a/180)*Math.PI) * -10;
-        var y2 = Math.sin((a/180)*Math.PI) * -10;
-        Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
+        for (i in Client.players) {
+            p = Client.players[i];
+
+            // draw an arrow in the most gorgeously graceful way ever!!
+            var offset = Client.camera.getOffset(p.getPosition());
+            var a = p.a;
+            var x1 = offset.x + Math.cos((a/180)*Math.PI) * 25;
+            var y1 = offset.y + Math.sin((a/180)*Math.PI) * 25;
+            Client.surface.line(offset.x, offset.y, x1, y1, "rgb(255, 0, 0)");
+            a = a - 30;
+            var x2 = Math.cos((a/180)*Math.PI) * -10;
+            var y2 = Math.sin((a/180)*Math.PI) * -10;
+            Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
+            a = a + 60;
+            var x2 = Math.cos((a/180)*Math.PI) * -10;
+            var y2 = Math.sin((a/180)*Math.PI) * -10;
+            Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
+        }
         
     },
 
