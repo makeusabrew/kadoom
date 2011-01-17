@@ -86,6 +86,7 @@ var Client = {
     },
 
     loadState: function(data) {
+        console.log(data);
         Client.world.loadFromData(data.world);
         Client.cacheWorldTiles();
 
@@ -93,7 +94,7 @@ var Client = {
             var p = Player.factory();
             p.loadFromData(data.players[i]);
             Client.players[p.id] = p;
-            if (p.id == data.sessionId) {
+            if (p.id == data.playerId) {
                 Client.player = p;
                 Client.playerHash = Client.getPlayer().hashState();
             }
@@ -107,9 +108,11 @@ var Client = {
         Client.players[p.id] = p;
     },
 
+    removePlayer: function(data) {
+        delete Client.players[p.id];
+    },
+
     playerMove: function(data) {
-        console.log(data);
-        console.log(Client.players);
         Client.players[data.id].loadFromData(data);
     },
 

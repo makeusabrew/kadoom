@@ -92,8 +92,8 @@ var worldData = {
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
     tiles: {
-        0: "/img/tiles/blank.jpg",
-        1: "/img/tiles/wall.jpg"
+        0: "/img/tiles/blank.png",
+        1: "/img/tiles/wall.png"
     }
 };
 
@@ -101,19 +101,18 @@ stateManager.loadWorldFromData(worldData);    // @todo how do we make this load 
 
 socket.on("connection", function(socketClient) {
     var player = require("./game/shared/player").factory();
-    player.setId(socketClient.sessionId);
     stateManager.addPlayer(player);
 
     // inform other clients
     socketClient.broadcast({
         'type': 'addPlayer',
-        'data': player.getCurrentState(socketClient.sessionId)
+        'data': player.getCurrentState()
     });
     // give this client info about the world state. probably should just
     // consolodate this to world.getData() or something at some stage
     socketClient.send({
         'type': 'loadState',
-        'data': stateManager.getCurrentState(socketClient.sessionId)
+        'data': stateManager.getCurrentState()
     });
 
     socketClient.on("message", function(data) {
@@ -123,5 +122,12 @@ socket.on("connection", function(socketClient) {
                 socketClient.broadcast(data);
                 break;
         }
+    });
+
+    socketClient.on("disconnect", function() {
+        socketClient.broadcast({
+            'type': 'removePlayer',
+            'data': player.getCurrentState()
+        });
     });
 });

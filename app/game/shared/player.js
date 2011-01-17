@@ -15,12 +15,16 @@ Player.prototype.setId = function(id) {
     this.id = id;
 };
 
-Player.prototype.getCurrentState = function(sessionId) {
+Player.prototype.getId = function() {
+    return this.id;
+};
+
+Player.prototype.getCurrentState = function() {
     return {
         'x': this.x,
         'y': this.y,
         'a': this.a,
-        'id': this.id
+        'id': this.getId()
     };
 };
 

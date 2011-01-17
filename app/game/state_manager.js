@@ -1,6 +1,7 @@
 StateManager = function() {
     this.world = null;
     this.players = {};
+    this.cPlayerId = 0;
 };
 
 StateManager.prototype.init = function() {
@@ -8,25 +9,27 @@ StateManager.prototype.init = function() {
 };
 
 StateManager.prototype.addPlayer = function(p) {
-    this.players[p.id] = p;
+    this.cPlayerId ++;
+    p.setId(this.cPlayerId);
+    this.players[this.cPlayerId] = p;
 };
 
 StateManager.prototype.loadWorldFromData = function(data) {
     this.world.loadFromData(data);
 };
 
-StateManager.prototype.getCurrentState = function(sessionId) {
+StateManager.prototype.getCurrentState = function() {
     return {
-        'world': this.world.getCurrentState(sessionId),
-        'players': this.getPlayerStates(sessionId),
-        'sessionId': sessionId
+        'world': this.world.getCurrentState(),
+        'players': this.getPlayerStates(),
+        'playerId': this.cPlayerId
     };
 };
 
-StateManager.prototype.getPlayerStates = function(sessionId) {
+StateManager.prototype.getPlayerStates = function() {
     var states = [];
     for (i in this.players) {
-        states.push(this.players[i].getCurrentState(sessionId));
+        states.push(this.players[i].getCurrentState());
     }
     return states;
 };

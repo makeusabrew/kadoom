@@ -19,7 +19,7 @@ World.prototype.getTile = function(x, y) {
     return null;
 };
 
-World.prototype.getCurrentState = function(sessionId) {
+World.prototype.getCurrentState = function() {
     return {
         'cells': this.cells,
         'tiles': this.tiles,
