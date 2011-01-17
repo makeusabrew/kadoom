@@ -1,3 +1,5 @@
+var fs = require("fs");
+
 StateManager = function() {
     this.world = null;
     this.players = {};
@@ -36,6 +38,10 @@ StateManager.prototype.getPlayerStates = function() {
 
 StateManager.prototype.movePlayer = function(data) {
     this.players[data.id].loadFromData(data);
+};
+
+StateManager.prototype.loadData = function(file) {
+    return JSON.parse(fs.readFileSync(file));
 };
 
 StateManager.factory = function() {
