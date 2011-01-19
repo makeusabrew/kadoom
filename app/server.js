@@ -106,5 +106,6 @@ socket.on("connection", function(socketClient) {
             'type': 'removePlayer',
             'data': player.getCurrentState()
         });
+        stateManager.removePlayer(player.getId());
     });
 });

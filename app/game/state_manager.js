@@ -40,6 +40,10 @@ StateManager.prototype.movePlayer = function(data) {
     this.players[data.id].loadFromData(data);
 };
 
+StateManager.prototype.removePlayer = function(pId) {
+    delete this.players[pId];
+};
+
 StateManager.prototype.loadData = function(file) {
     return JSON.parse(fs.readFileSync(file));
 };
