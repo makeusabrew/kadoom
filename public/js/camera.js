@@ -27,6 +27,20 @@ Camera.prototype.getOffset = function(p) {
     };
 };
 
+Camera.prototype.clipToBounds = function(x, y) {
+    if (this.x < 0) {
+        this.x = 0;
+    } else if (this.x > x - this.width) {
+        this.x = x - this.width;
+    }
+
+    if (this.y < 0) {
+        this.y = 0;
+    } else if (this.y > y - this.height) {
+        this.y = y - this.height;
+    }
+};
+
 Camera.factory = function() {
     return new Camera();
 }

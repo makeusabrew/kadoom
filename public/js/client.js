@@ -118,6 +118,7 @@ var Client = {
 
     render: function() {
         Client.camera.centreOnPosition(Client.getPlayer().getPosition());
+        Client.camera.clipToBounds(Client.world.width*32, Client.world.height*32);
 
         Client.surface.clear();
         var cX = Math.floor(Client.camera.x / 32);
@@ -125,10 +126,8 @@ var Client = {
         var xOff = Client.camera.x % 32;
         var yOff = Client.camera.y % 32;
 
-        //console.log("cX: "+cX+" cY: "+cY+" xOff: "+xOff+" yOff: "+yOff);
-
-        for (var i = 0; i < 20; i++) {
-            for (var j = 0; j < 15; j++) {
+        for (var i = 0; i < 21; i++) {
+            for (var j = 0; j < 16; j++) {
                 var tile = Client.world.getTile(cX+i, cY+j);
                 if (tile !== null) {
                     Client.surface.drawImage(Client.tileCache[tile], (i*32)-xOff, (j*32)-yOff, 32, 32);
