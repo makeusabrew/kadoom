@@ -123,8 +123,8 @@ var Client = {
         Client.surface.clear();
         var cX = Math.floor(Client.camera.x / 32);
         var cY = Math.floor(Client.camera.y / 32);
-        var xOff = Client.camera.x % 32;
-        var yOff = Client.camera.y % 32;
+        var xOff = Math.floor(Client.camera.x) % 32;
+        var yOff = Math.floor(Client.camera.y) % 32;
 
         for (var i = 0; i < 21; i++) {
             for (var j = 0; j < 16; j++) {
