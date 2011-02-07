@@ -178,7 +178,7 @@ var Client = {
             Client.updateState(data);
             setTimeout(function() {
                 Client.queryServer();
-            }, 50);
+            }, 33);
         },
 
         initialState: function(data) {
