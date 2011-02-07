@@ -2,29 +2,37 @@ if (typeof require === "function") {
     var Weapon = require("./weapon");
 }
 Player = function() {
+    var _id = 0;
+
+    //@todo scope!!
     this.x = 320;
     this.y = 240;
     this.a = 0;
     this.rotation = 0;
     this.velocity = 0;
-    this.id = 0;
     this._wantsToFire = false;
     this._cWeapon = 0;
     this._weapons = {
         "0": Weapon.factory()
     };
+
+    this.updateState = function(state) {
+        this.x = state.x;
+        this.y = state.y;
+        this.a = state.a;
+    };
+
+    this.setId = function(id) {
+        _id = id;
+    };
+
+    this.getId = function() {
+        return _id;
+    };
 };
 
 Player.prototype.init = function() {
     //
-};
-
-Player.prototype.setId = function(id) {
-    this.id = id;
-};
-
-Player.prototype.getId = function() {
-    return this.id;
 };
 
 Player.prototype.getCurrentState = function() {
@@ -37,11 +45,13 @@ Player.prototype.getCurrentState = function() {
     };
 };
 
+Player.prototype.getInitialState = Player.prototype.getCurrentState;
+
 Player.prototype.loadFromData = function(data) {
     this.x = data.x;
     this.y = data.y;
     this.a = data.a;
-    this.id = data.id;
+    this.setId(data.id);
 };
 
 Player.prototype.move = function() {

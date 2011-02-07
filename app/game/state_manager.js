@@ -1,4 +1,5 @@
-var fs = require("fs");
+var fs = require("fs"),
+    util = require("util");
 
 StateManager = function() {
    var _world = null;
@@ -19,13 +20,20 @@ StateManager = function() {
         _world.loadFromData(data);
     };
 
-    this.getCurrentState = function() {
+    this.getInitialState = function() {
         return {
             'world': _world.getCurrentState(),
             'players': this.getPlayerStates(),
             'playerId': _cPlayerId
         };
     };
+
+    this.getCurrentState = function() {
+        return {
+            "players": this.getPlayerStates()
+        };
+    };
+
     this.getPlayerStates = function() {
         var states = [];
         for (i in _players) {
@@ -60,7 +68,7 @@ StateManager = function() {
         return JSON.parse(fs.readFileSync(file));
     };
 
-    this. removePlayer = function(pId) {
+    this.removePlayer = function(pId) {
         delete _players[pId];
     };
 
@@ -70,16 +78,18 @@ StateManager = function() {
             var player = require("./shared/player").factory();
             self.addPlayer(player);
 
+            client.player = player;
+
             // inform other clients
             client.broadcast({
                 'type': 'addPlayer',
-                'data': player.getCurrentState()
+                'data': client.player.getInitialState()
             });
 
             // greet client
             client.send({
                 "type": "initialState",
-                "data": self.getCurrentState()
+                "data": self.getInitialState()
             });
 
             // setup handlers for later
@@ -90,17 +100,18 @@ StateManager = function() {
             client.on("disconnect", function() {
                 client.broadcast({
                     'type': 'removePlayer',
-                    'data': player.getCurrentState()
+                    'data': client.player.getId()
                 });
-                self.removePlayer(player.getId());
+                self.removePlayer(client.player.getId());
             });
         });
     };
 
     this.onMessage = function(client, msg) {
-        if (typeof _receive[msg.type] == "function") {
+        if (typeof this[msg.type] == "function") {
             if (typeof msg.data != "undefined") {
-                _receive[msg.type](client, msg.data);
+                //util.debug("received ["+msg.type+"] with data:", msg.data);
+                this[msg.type](client, msg.data);
             } else {
                 throw new Error("Message has no data element");
             }
@@ -112,10 +123,13 @@ StateManager = function() {
     /**
      * receive handlers
      */
-    var _receive = {
-        stateUpdate: function(client, data) {
-            // what's new for this client?
-        }
+    this.stateUpdate =  function(client, data) {
+        // okay, update anything the client gave us
+        client.player.updateState(data);
+        client.send({
+            "type": "stateUpdate",
+            "data": this.getCurrentState()
+        });
     };
 };
 

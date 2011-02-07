@@ -2,31 +2,33 @@
  * Simple pub / sub wrapper
  ***************************************/
 
-var Bus = {
-    listeners: {},
+var Bus = (function() {
+    var _listeners = {};
+    var self = this;
 
-    publish: function(topic, data) {
+    self.publish = function(topic, data) {
         if (typeof data == "undefined") {
             data = null;
         }
 
-        if (typeof this.listeners[topic] === "undefined") {
+        if (typeof _listeners[topic] === "undefined") {
             // no listeners for topic. cya
             return;
         }
 
         var i = 0;
-        var listeners = this.listeners[topic];
-        for (var i = 0; i < listeners.length; i++) {
+        var listeners = _listeners[topic];
+        for (i = 0; i < listeners.length; i++) {
             listeners[i](data);
         }
-    },
+    };
 
-    subscribe: function(topic, callback) {
-        if (typeof this.listeners[topic] === "undefined") {
-            this.listeners[topic] = [];
+    self.subscribe = function(topic, callback) {
+        if (typeof _listeners[topic] === "undefined") {
+            _listeners[topic] = [];
         }
-        this.listeners[topic].push(callback);
-    }
-}
-        
+        _listeners[topic].push(callback);
+    };
+
+    return self;
+})();

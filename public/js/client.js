@@ -78,7 +78,7 @@ var Client = {
     onMessage: function(data) {
         if (typeof Client.receive[data.type] == "function") {
             if (typeof data.data != "undefined") {
-                console.log("received ["+data.type+"] with data:", data.data);
+                //console.log("received ["+data.type+"] with data:", data.data);
                 Client.receive[data.type](data.data);
             } else {
                 throw new Error("Message has no data element");
@@ -157,39 +157,57 @@ var Client = {
         this.send("stateUpdate", this.getCurrentState());
     },
 
+    updateState: function(data) {
+        var i;
+        for (i = 0; i < data.players.length; i++) {
+            var pdata = data.players[i];
+            if (typeof Client.players[pdata.id] === "undefined") {
+                console.log("not updating state for unknown player ID ["+pdata.id+"]");
+                continue;
+            }
+            Client.players[pdata.id].updateState(pdata);
+        }
+    },
+
     /**
      * any messages from the server should go here
      */
     receive: {
         stateUpdate: function(data) {
-            //
+            // update
+            Client.updateState(data);
+            setTimeout(function() {
+                Client.queryServer();
+            }, 50);
         },
 
         initialState: function(data) {
-            console.log(data);
+            console.log("initial state", data);
             Client.world.loadFromData(data.world);
             Client.cacheWorldTiles();
 
             for(var i = 0; i < data.players.length; i++) {
+                var pdata = data.players[i];
                 var p = Player.factory();
-                p.loadFromData(data.players[i]);
-                Client.players[p.id] = p;
-                if (p.id == data.playerId) {
+                p.loadFromData(pdata);
+                Client.players[pdata.id] = p;
+                if (pdata.id == data.playerId) {
                     Client.player = p;
-                    Client.playerHash = Client.getPlayer().hashState();
                 }
             }
             Bus.publish("client:ready");
         },
 
         addPlayer: function(data) {
+            console.log("adding player ID ["+data.id+"]");
             var p = Player.factory();
             p.loadFromData(data);
-            Client.players[p.id] = p;
+            Client.players[p.getId()] = p;
         },
 
         removePlayer: function(data) {
-            delete Client.players[p.id];
+            console.log("removing player ID ["+data+"]");
+            delete Client.players[data];
         },
 
         playerMove: function(data) {
