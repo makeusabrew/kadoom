@@ -1,9 +1,8 @@
 /****************************************
- * Simple pub / sub wrapper using jquery
+ * Simple pub / sub wrapper
  ***************************************/
 
 var Bus = {
-    _bindTo: document,
     listeners: {},
 
     publish: function(topic, data) {

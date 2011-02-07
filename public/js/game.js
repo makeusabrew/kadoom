@@ -1,6 +1,9 @@
 var Game = {
     fps: 30,
     tickHandler: null,
+    frame: 0,
+    lastTick: 0,
+    tickTime: 0,
 
     renderStack: [],
     tickStack: [],
@@ -11,11 +14,9 @@ var Game = {
         Game.doTicks();
         Game.render();
 
-        // yes, setInterval may seem more logical, but let's use setTimeout
-        // so we can dynamically adjust at run time (maybe)
-        Game.tickHandler = setTimeout(function() {
-            Game.tick();
-        }, 1000/Game.fps);
+        var t =  new Date().getTime();
+        Game.tickTime = t - Game.lastTick;
+        Game.frame ++;
     },
 
     registerRenderHandler: function(method) {

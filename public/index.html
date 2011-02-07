@@ -14,7 +14,9 @@
         <script src="/js/input.js"></script>
         <script src="/js/surface.js"></script>
         <!-- shared client/server logic -->
+        <script src="/js/shared/bullet.js"></script>
         <script src="/js/shared/player.js"></script>
+        <script src="/js/shared/weapon.js"></script>
         <script src="/js/shared/world.js"></script>
         <script>
             var onLoad = function() {
@@ -44,9 +46,14 @@
 
                 Input.bindKeys(window);
 
-                Bus.subscribe("client_ready", null, function() {
+                Bus.subscribe("client:ready", function() {
                     // @todo remove loader, show world
+                    Game.tickHandler = setInterval(function() {
+                        Game.tick();
+                    }, 1000/Game.fps);
+                    Game.lastTick = new Date().getTime();
                     Game.tick();
+                    Client.queryServer();
                 });
             };
         </script>
