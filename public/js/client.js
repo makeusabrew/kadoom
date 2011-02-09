@@ -9,9 +9,10 @@ var Client = {
     tileCache: {},
     awaitingConfirmation: false,
     bullets: [],
+    messageBox: null,
 
     init: function() {
-        //
+        this.messageBox = new MessageBox($("#messages"));
     },
 
     setViewport: function(options) {
@@ -207,10 +208,10 @@ var Client = {
         },
 
         addPlayer: function(data) {
-            console.log("adding player ID ["+data.id+"] with username ["+data.u+"]");
             var p = Player.factory();
             p.loadFromData(data);
             Client.players[p.getId()] = p;
+            Client.addMessage(""+data.u+" has joined the game");
         },
 
         removePlayer: function(data) {
@@ -263,5 +264,10 @@ var Client = {
         Cookie.write("kdm_user", username);
         Client.send("newPlayer", {"username":username});
         Bus.publish("client:authorised");
+    },
+
+    // simple wrapper func for our messageBox object
+    addMessage: function(msg) {
+        Client.messageBox.addMessage(msg);
     }
 }

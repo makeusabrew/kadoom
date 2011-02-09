@@ -1,7 +1,29 @@
+html, body {
+    font-family:Helvetica, Arial, sans-serif;
+}
+
 .hidden {
     display: none;
 }
 
+#game {
+    width:100%;
+    overflow:auto;
+}
+
 #viewport {
+    float:left;
     border:1px solid black;
+    width:640px;
+    height:480px;
+}
+
+#messages {
+    float:left;
+    margin-left:20px;
+    width:200px;
+    height:480px;
+    overflow:hidden;
+    border:1px solid black;
+    font-size:80%;
 }
