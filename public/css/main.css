@@ -1,0 +1,7 @@
+.hidden {
+    display: none;
+}
+
+#viewport {
+    border:1px solid black;
+}

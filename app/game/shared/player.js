@@ -12,7 +12,8 @@ Player = function() {
         _cWeapon = 0,
         _weapons = {
             "0": Weapon.factory()
-        };
+        },
+        _username;
 
     this.updateState = function(state) {
         _x = state.x;
@@ -38,14 +39,18 @@ Player = function() {
         };
     };
 
-    // no different in initial state, for now
-    this.getInitialState = this.getCurrentState;
+    this.getInitialState = function() {
+        var state = this.getCurrentState();
+        state.u = _username;
+        return state;
+    };
 
     this.loadFromData = function(data) {
         _x = data.x;
         _y = data.y;
         _a = data.a;
         _id = data.id;
+        _username = data.u;
     };
 
     this.move = function() {
@@ -96,6 +101,10 @@ Player = function() {
 
     this.setVelocity = function(v) {
         _velocity = v;
+    };
+
+    this.setUsername = function(username) {
+        _username = username;
     };
 };
 

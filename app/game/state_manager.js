@@ -10,9 +10,10 @@ StateManager = function() {
         _world = require("./shared/world").factory();
     };
 
-    this.addPlayer = function(p) {
+    this.addPlayer = function(p, data) {
         _cPlayerId ++;
         p.setId(_cPlayerId);
+        p.setUsername(data.username);
         _players[_cPlayerId] = p;
     };
 
@@ -23,7 +24,7 @@ StateManager = function() {
     this.getInitialState = function() {
         return {
             'world': _world.getCurrentState(),
-            'players': this.getPlayerStates(),
+            'players': this.getInitialPlayerStates(),
             'playerId': _cPlayerId
         };
     };
@@ -38,6 +39,14 @@ StateManager = function() {
         var states = [];
         for (i in _players) {
             states.push(_players[i].getCurrentState());
+        }
+        return states;
+    };
+
+    this.getInitialPlayerStates = function() {
+        var states = [];
+        for (i in _players) {
+            states.push(_players[i].getInitialState());
         }
         return states;
     };
@@ -75,34 +84,18 @@ StateManager = function() {
     this.setupSocket = function(socket) {
         var self = this;
         socket.on("connection", function(client) {
-            var player = require("./shared/player").factory();
-            self.addPlayer(player);
-
-            client.player = player;
-
-            // inform other clients
-            client.broadcast({
-                'type': 'addPlayer',
-                'data': client.player.getInitialState()
-            });
-
-            // greet client
-            client.send({
-                "type": "initialState",
-                "data": self.getInitialState()
-            });
-
             // setup handlers for later
             client.on("message", function(msg) {
                 self.onMessage(client, msg);
             });
-
             client.on("disconnect", function() {
-                client.broadcast({
-                    'type': 'removePlayer',
-                    'data': client.player.getId()
-                });
-                self.removePlayer(client.player.getId());
+                if (typeof client.player !== "undefined") {
+                    client.broadcast({
+                        'type': 'removePlayer',
+                        'data': client.player.getId()
+                    });
+                    self.removePlayer(client.player.getId());
+                }
             });
         });
     };
@@ -123,7 +116,7 @@ StateManager = function() {
     /**
      * receive handlers
      */
-    this.stateUpdate =  function(client, data) {
+    this.stateUpdate = function(client, data) {
         // okay, update anything the client gave us
         client.player.updateState(data);
         client.send({
@@ -131,6 +124,38 @@ StateManager = function() {
             "data": this.getCurrentState()
         });
     };
+
+    this.newPlayer = function(client, data) {
+        var player = require("./shared/player").factory();
+        this.addPlayer(player, data);
+
+        client.player = player;
+        // inform other clients
+        client.broadcast({
+            'type': 'addPlayer',
+            'data': client.player.getInitialState()
+        });
+
+        // tell new player what's going on
+        client.send({
+            "type": "initialState",
+            "data": this.getInitialState()
+        });
+    },
+
+    this.setUsername = function(client, data) {
+        var username = decodeURIComponent(data.username);
+        var isValid = (username.search(/^[a-z0-9]+$/) !== -1);
+        util.debug("username value ["+username+"] - valid? ["+isValid.toString()+"]");
+        client.send({
+            "type": "setUsername",
+            "data": {
+                "valid": isValid,
+                "username": username
+            }
+        });
+    }
+
 };
 
 StateManager.factory = function() {

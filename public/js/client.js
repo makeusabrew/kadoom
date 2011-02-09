@@ -207,7 +207,7 @@ var Client = {
         },
 
         addPlayer: function(data) {
-            console.log("adding player ID ["+data.id+"] with data:", data);
+            console.log("adding player ID ["+data.id+"] with username ["+data.u+"]");
             var p = Player.factory();
             p.loadFromData(data);
             Client.players[p.getId()] = p;
@@ -229,6 +229,39 @@ var Client = {
                 Client.awaitingConfirmation = false;
             }
             Clients.bullets.push(b);
+        },
+
+        setUsername: function(data) {
+            if (data.valid === true) {
+                Client.newPlayer(data.username);
+            } else {
+                alert("Please enter a username - lowercase letters and numbers only!");
+            }
         }
+    },
+
+    authoriseUser: function() {
+        var username = Cookie.read("kdm_user");
+        if (username === false) {
+            //@todo how do we improve 'scene' management?
+            $("#authorise").show();
+            $("#authorise input[type='submit']").click(function() {
+                username = $("#authorise input[type='text']").val();
+                if ($.trim(username) == "") {
+                    alert("Please enter a username - lowercase letters and numbers only!");
+                    return false;
+                }
+                Client.send("setUsername", {"username":encodeURIComponent(username)});
+            });
+        } else {
+            Client.send("setUsername", {"username":encodeURIComponent(username)});
+        };
+    },
+
+    newPlayer: function(username) {
+        //@todo again, scene management?
+        Cookie.write("kdm_user", username);
+        Client.send("newPlayer", {"username":username});
+        Bus.publish("client:authorised");
     }
 }

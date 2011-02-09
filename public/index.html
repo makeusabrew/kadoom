@@ -3,10 +3,13 @@
     <head>
         <meta charset="utf-8">
         <title>Kadoom!</title>
+        <!-- stylesheets -->
+        <link rel="stylesheet" href="/css/main.css" />
         <!-- global dependencies -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <!-- client side only code -->
+        <script src="/js/utils/cookie.js"></script>
         <script src="/js/bus.js"></script>
         <script src="/js/camera.js"></script>
         <script src="/js/client.js"></script>
@@ -21,40 +24,47 @@
         <script>
             var onLoad = function() {
                 // @todo show loading state
-                Client.init();  // this is _local_ initialisation rather than remote
-                Client.setCamera(Camera.factory());
-                //Client.setPlayer(Player.factory());
-                Client.setWorld(World.factory());
-                Client.setViewport({
-                    'buffer':   'viewport',
-                    'width':    640,
-                    'height':   480 
-                });
-                Client.connect();
+                Bus.subscribe("client:authorised", function() {
+                    $("#authorise").hide();
+                    $("#game").show();
+                    Client.init();  // this is _local_ initialisation rather than remote
+                    Client.setCamera(Camera.factory());
+                    //Client.setPlayer(Player.factory());
+                    Client.setWorld(World.factory());
+                    Client.setViewport({
+                        'buffer':   'viewport',
+                        'width':    640,
+                        'height':   480 
+                    });
 
-                Game.registerInputHandler(Client.processInput);
-                Game.registerTickHandler(Client.tick);
-                Game.registerRenderHandler(Client.render);
+                    Game.registerInputHandler(Client.processInput);
+                    Game.registerTickHandler(Client.tick);
+                    Game.registerRenderHandler(Client.render);
 
-                Input.captureKeys([
-                    'LEFT_ARROW',
-                    'RIGHT_ARROW',
-                    'UP_ARROW',
-                    'DOWN_ARROW',
-                    'SPACE_BAR'
-                ]);
+                    Input.captureKeys([
+                        'LEFT_ARROW',
+                        'RIGHT_ARROW',
+                        'UP_ARROW',
+                        'DOWN_ARROW',
+                        'SPACE_BAR'
+                    ]);
 
-                Input.bindKeys(window);
+                    Input.bindKeys(window);
 
-                Bus.subscribe("client:ready", function() {
-                    // @todo remove loader, show world
-                    Game.tickHandler = setInterval(function() {
+                    Bus.subscribe("client:ready", function() {
+                        // @todo remove loader, show world
+                        Game.tickHandler = setInterval(function() {
+                            Game.tick();
+                        }, 1000/Game.fps);
+                        Game.lastTick = new Date().getTime();
                         Game.tick();
-                    }, 1000/Game.fps);
-                    Game.lastTick = new Date().getTime();
-                    Game.tick();
-                    Client.queryServer();
+                        Client.queryServer();
+                    });
                 });
+
+                // go!
+                Client.connect();
+                Client.authoriseUser();
             };
         </script>
     </head>
@@ -62,10 +72,14 @@
         <header>
             <h1>Kadoom!</h1>
         </header>
-        <div>
-            The good stuff will happen here!
+        <div id="authorise" class="hidden">
+            <p>Before you begin...</p>
+            <p><input type="text" placeholder="Enter your username" value="" /></p>
+            <input type="submit" value="Let's Go!" />
         </div>
-        <canvas id="viewport" style="border:1px solid black;"></canvas>
+        <div id="game" class="hidden">
+            <canvas id="viewport"></canvas>
+        </div>
         <footer>
             by <a href="http://github.com/makeusabrew">makeusabrew</a>
         </footer>
