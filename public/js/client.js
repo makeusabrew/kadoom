@@ -30,27 +30,29 @@ var Client = {
     },
 
     processInput: function() {
+        var player = Client.getPlayer();
+        var rotation = 0;
+        var velocity = 0;
         if (Input.isKeyDown("LEFT_ARROW")) {
-            Client.getPlayer().rotation = -10;
+            rotation = -10;
         } else if (Input.isKeyDown("RIGHT_ARROW")) {
-            Client.getPlayer().rotation = 10;
-        } else {
-            Client.getPlayer().rotation = 0;
+            rotation = 10;
         }
 
         if (Input.isKeyDown("UP_ARROW")) {
-            Client.getPlayer().velocity = 10;
+            velocity = 10;
         } else if (Input.isKeyDown("DOWN_ARROW")) {
-            Client.getPlayer().velocity = -10;
-        } else {
-            Client.getPlayer().velocity = 0;
+            velocity = -10;
         }
 
         if (Input.isKeyDown("SPACE_BAR")) {
-            Client.getPlayer().wantsToFire(true);
+            player.wantsToFire(true);
         } else {
-            Client.getPlayer().wantsToFire(false);
+            player.wantsToFire(false);
         }
+
+        player.setRotation(rotation);
+        player.setVelocity(velocity);
     },
 
     setCamera: function(c) {
@@ -90,6 +92,7 @@ var Client = {
 
 
     render: function() {
+        var pos = Client.getPlayer().getPosition();
         Client.camera.centreOnPosition(Client.getPlayer().getPosition());
         Client.camera.clipToBounds(Client.world.width*32, Client.world.height*32);
 
@@ -108,12 +111,13 @@ var Client = {
             }
         }
         
-        for (i in Client.players) {
-            p = Client.players[i];
+        var p,k;
+        for (k in Client.players) {
+            p = Client.players[k];
 
             // draw an arrow in the most gorgeously graceful way ever!!
             var offset = Client.camera.getOffset(p.getPosition());
-            var a = p.a;
+            var a = p.getAngle();
             var x1 = offset.x + Math.cos((a/180)*Math.PI) * 25;
             var y1 = offset.y + Math.sin((a/180)*Math.PI) * 25;
             Client.surface.line(offset.x, offset.y, x1, y1, "rgb(255, 0, 0)");
@@ -127,10 +131,12 @@ var Client = {
             Client.surface.line(x1, y1, x1 + x2, y1 + y2, "rgb(255, 0, 0)");
         }
 
+        /*
         for (var i = 0; i < Client.bullets.length; i++) {
             var b = Client.bullets[i].getCurrentState();
             Client.surface.pixel(b.x, b.y, "rgb(0, 0, 255)");
         }
+        */
         
     },
 
@@ -165,7 +171,9 @@ var Client = {
                 console.log("not updating state for unknown player ID ["+pdata.id+"]");
                 continue;
             }
-            Client.players[pdata.id].updateState(pdata);
+            if (pdata.id != Client.getPlayer().getId()) {
+                Client.players[pdata.id].updateState(pdata);
+            }
         }
     },
 
@@ -199,7 +207,7 @@ var Client = {
         },
 
         addPlayer: function(data) {
-            console.log("adding player ID ["+data.id+"]");
+            console.log("adding player ID ["+data.id+"] with data:", data);
             var p = Player.factory();
             p.loadFromData(data);
             Client.players[p.getId()] = p;

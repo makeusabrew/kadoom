@@ -2,24 +2,22 @@ if (typeof require === "function") {
     var Weapon = require("./weapon");
 }
 Player = function() {
-    var _id = 0;
-
-    //@todo scope!!
-    this.x = 320;
-    this.y = 240;
-    this.a = 0;
-    this.rotation = 0;
-    this.velocity = 0;
-    this._wantsToFire = false;
-    this._cWeapon = 0;
-    this._weapons = {
-        "0": Weapon.factory()
-    };
+    var _id = 0,
+        _x = 320,
+        _y = 240,
+        _a = 0,
+        _rotation = 0,
+        _velocity = 0,
+        _wantsToFire = false,
+        _cWeapon = 0,
+        _weapons = {
+            "0": Weapon.factory()
+        };
 
     this.updateState = function(state) {
-        this.x = state.x;
-        this.y = state.y;
-        this.a = state.a;
+        _x = state.x;
+        _y = state.y;
+        _a = state.a;
     };
 
     this.setId = function(id) {
@@ -29,69 +27,78 @@ Player = function() {
     this.getId = function() {
         return _id;
     };
-};
 
-Player.prototype.init = function() {
-    //
-};
-
-Player.prototype.getCurrentState = function() {
-    return {
-        'x': this.x,
-        'y': this.y,
-        'a': this.a,
-        'w': this._cWeapon,
-        'id': this.getId()
+    this.getCurrentState = function() {
+        return {
+            'x': _x,
+            'y': _y,
+            'a': _a,
+            'w': _cWeapon,
+            'id': _id
+        };
     };
-};
 
-Player.prototype.getInitialState = Player.prototype.getCurrentState;
+    // no different in initial state, for now
+    this.getInitialState = this.getCurrentState;
 
-Player.prototype.loadFromData = function(data) {
-    this.x = data.x;
-    this.y = data.y;
-    this.a = data.a;
-    this.setId(data.id);
-};
+    this.loadFromData = function(data) {
+        _x = data.x;
+        _y = data.y;
+        _a = data.a;
+        _id = data.id;
+    };
 
-Player.prototype.move = function() {
-    this.a += this.rotation;
-    this.x +=  Math.cos((this.a/180)*Math.PI) * this.velocity;
-    this.y += Math.sin((this.a/180)*Math.PI) * this.velocity;
-};
+    this.move = function() {
+        _a += _rotation;
+        _x +=  Math.cos((_a/180)*Math.PI) * _velocity;
+        _y += Math.sin((_a/180)*Math.PI) * _velocity;
+    };
 
-Player.prototype.getPosition = function() {
-    return {
-        x: this.x,
-        y: this.y,
+    this.getPosition = function() {
+        return {
+            x: _x,
+            y: _y
+        }
+    };
+
+    this.hashState = function() {
+        return "|"+_x+"|"+_y+"|"+_a+"|";
+    };
+
+    this.wantsToFire = function(val) {
+        _wantsToFire = val;
     }
-};
 
-Player.prototype.hashState = function() {
-    return "|"+this.x+"|"+this.y+"|"+this.a+"|";
-};
-
-Player.prototype.wantsToFire = function(val) {
-    this._wantsToFire = val;
-}
-
-Player.prototype.waitingToFire = function() {
-    return this._wantsToFire;
-};
-
-Player.prototype.getWeapon = function() {
-    return this._weapons[this._cWeapon];
-};
-
-Player.prototype.fireWeapon = function() {
-    var opts = {
-        x: this.x,
-        y: this.y,
-        a: this.a,
-        o: this.getId()
+    this.waitingToFire = function() {
+        _wantsToFire;
     };
-    this.getWeapon().fire(opts);
+
+    this.getWeapon = function() {
+        _weapons[_cWeapon];
+    };
+    this.fireWeapon = function() {
+        var opts = {
+            x: _x,
+            y: _y,
+            a: _a,
+            o: _id
+        };
+        this.getWeapon().fire(opts);
+    };
+
+    this.getAngle = function() {
+        return _a;
+    };
+
+    this.setRotation = function(r) {
+        _rotation = r;
+    };
+
+    this.setVelocity = function(v) {
+        _velocity = v;
+    };
 };
+
 
 Player.factory = function() {
     return new Player();
